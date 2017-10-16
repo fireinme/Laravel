@@ -7,17 +7,26 @@ use App\User as User;
 
 class UsersController extends Controller
 {
-    //
+    public function __construct()
+    {
+        $this->middleware('auth', [
+            'except' => ['create', 'store']
+        ]);
+    }
+
+    //注册用户
     public function create()
     {
         return view('users/create');
     }
 
+    //展示用户信息
     public function show(User $user)
     {
         return view('users/show', compact('user'));
     }
 
+    //验证并存贮验证信息
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -34,5 +43,30 @@ class UsersController extends Controller
         Auth::login($user);
         session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
         return redirect()->route('users.show', $user);
+    }
+
+    //编辑用户信息
+    public function edit(User $user)
+    {
+
+        return view('users.edit', compact('user'));
+    }
+
+    //更新用户信息
+    public function update(User $user, Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|max:50',
+            'password' => 'nullable|confirmed|min:6'
+        ]);
+        $this->authorize('update', $user);
+        $data = [];
+        $data['name'] = $request->name;
+        if ($request->password) {
+            $data['password'] = bcrypt($request->password);
+        }
+        $user->update($data);
+        session()->flash('success', '个人资料更改成功');
+        return redirect()->route('users.show', $user->id);
     }
 }
