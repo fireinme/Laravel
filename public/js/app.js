@@ -24040,7 +24040,7 @@ var getStyles = function( elem ) {
 
 ( function() {
 
-	// Executing both pixelPosition & boxSizingReliable tests require only one layouts
+	// Executing both pixelPosition & boxSizingReliable tests require only one layout
 	// so they're executed at the same time to save the second computation.
 	function computeStyleTests() {
 
