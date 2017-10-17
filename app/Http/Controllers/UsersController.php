@@ -10,11 +10,19 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth', [
-            'except' => ['create', 'store']
+            'except' => ['create', 'store', 'index']
         ]);
         $this->middleware('guest', [
             'only' => ['create']
         ]);
+    }
+
+    //首页展示全部用户
+    public function index()
+    {
+        $users = User::paginate(10);
+        return view('users/index', compact('users'));
+
     }
 
     //注册用户
@@ -72,5 +80,15 @@ class UsersController extends Controller
         $user->update($data);
         session()->flash('success', '个人资料更改成功');
         return redirect()->route('users.show', $user->id);
+    }
+
+    //删除用户
+
+    public function destroy(User $user)
+    {
+        $this->authorize('destroy', $user);
+        $user->delete();
+        session()->flash('success', '删除用户成功！');
+        return back();
     }
 }
