@@ -12,6 +12,9 @@ class UsersController extends Controller
         $this->middleware('auth', [
             'except' => ['create', 'store']
         ]);
+        $this->middleware('guest', [
+            'only' => ['create']
+        ]);
     }
 
     //注册用户
@@ -40,6 +43,7 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
+
         Auth::login($user);
         session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
         return redirect()->route('users.show', $user);
@@ -48,7 +52,7 @@ class UsersController extends Controller
     //编辑用户信息
     public function edit(User $user)
     {
-
+        $this->authorize('update', $user);
         return view('users.edit', compact('user'));
     }
 
