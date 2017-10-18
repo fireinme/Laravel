@@ -47,4 +47,10 @@ class User extends Authenticatable
     {
         $this->notify(new ResetPassword($token));
     }
+
+    //用户与微博的依赖关系
+    public function status()
+    {
+        $this->hasMany(Status::class);
+    }
 }

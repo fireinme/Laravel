@@ -13,7 +13,7 @@ class UsersSeeder extends Seeder
     public function run()
     {
         //运行工厂，创建100条数据 插入数据表中
-        $users = factory(User::class)->times(1)->make();
+        $users = factory(User::class)->times(50)->make();
         User::insert($users->makeVisible(['password', 'remember_token'])->toArray());
         //修改第一个用户，以便以后登录
         $user = User::find(1);
