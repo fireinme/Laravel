@@ -51,6 +51,11 @@ class User extends Authenticatable
     //用户与微博的依赖关系
     public function status()
     {
-        $this->hasMany(Status::class);
+        return $this->hasMany(Status::class);
+    }
+
+    public function feed()
+    {
+        return $this->status()->orderBy('created_at', 'desc');
     }
 }
