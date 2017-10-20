@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -54,8 +55,47 @@ class User extends Authenticatable
         return $this->hasMany(Status::class);
     }
 
+    //展示微博数据
     public function feed()
     {
-        return $this->status()->orderBy('created_at', 'desc');
+        $user_ids = Auth::user()->followings->pluck('id')->toArray();
+        array_push($user_ids, Auth::user()->id);
+        return Status::whereIn('user_id', $user_ids)
+            ->with('user')
+            ->orderBy('created_at', 'desc');
+    }
+
+    public function followers()
+    {
+        //设置依赖关系
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'followers_id');
+    }
+
+    public function followings()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'followers_id', 'user_id');
+    }
+
+    public function unfollow($users_id)
+    {
+        if (!is_array($users_id)) {
+            $users_id = compact('users_id');
+        }
+        $this->followings()->detach($users_id);
+
+    }
+
+    public function follow($users_id)
+    {
+        if (!is_array($users_id)) {
+            $users_id = compact('users_id');
+        }
+        $this->followings()->attach($users_id);
+
+    }
+
+    public function isFollow($users_id)
+    {
+        return $this->followings()->allRelatedIds()->contains($users_id);
     }
 }
